@@ -1,0 +1,7 @@
+__pycache__/
+demo/
+signature/
+stamp/
+sandbox_test.*
+*.png
+*.bmp
