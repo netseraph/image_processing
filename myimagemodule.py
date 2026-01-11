@@ -1,6 +1,5 @@
 """图片操作常用工具"""
 
-from typing import Any
 from PIL import Image, ImageFont, ImageDraw
 
 
@@ -23,21 +22,48 @@ def gray_luminance(red: int, green: int, blue: int) -> int:
     return int(gray)
 
 
-def convert_to_signature(image_object: Any, threshold: int = 128):
-    """将图片对象转换成签名样式"""
+def convert_to_ico(picpath: str, icopath: str):
+    """将普通图片转换为ICO"""
 
-    if image_object.mode != "RGBA":
+    # 打开原始图片
+    _image = Image.open(picpath)
+    if _image.mode != "RGBA":
         # 给图片增加Alpha通道
-        image_object = image_object.convert("RGBA")
+        _image = _image.convert("RGBA")
 
-    _size = image_object.size
+    _image.save(
+        fp=icopath,
+        format="ico",
+        size=(
+            (16, 16),
+            (24, 24),
+            (32, 32),
+            (48, 48),
+            (64, 64),
+            (128, 128),
+            (256, 256),
+        ),
+    )
+
+
+def convert_to_signature(picpath: str, signpath: str, threshold: int = 128):
+    """将图片象转换成签名样式"""
+
+    # 打开原始图片
+    _image = Image.open(picpath)
+    if _image.mode != "RGBA":
+        # 给图片增加Alpha通道
+        _image = _image.convert("RGBA")
+
+    _size = _image.size
 
     for i in range(_size[0]):
         for j in range(_size[1]):
-            _pixel_color = image_object.getpixel((i, j))
-            _red = _pixel_color[0]
-            _green = _pixel_color[1]
-            _blue = _pixel_color[2]
+            _pixel_color = _image.getpixel((i, j))
+            print(type(_pixel_color), _pixel_color)
+            _red = int(_pixel_color[0])
+            _green = int(_pixel_color[1])
+            _blue = int(_pixel_color[2])
             _gray = gray_luma(_red, _green, _blue)
 
             if _gray > threshold:
@@ -47,9 +73,9 @@ def convert_to_signature(image_object: Any, threshold: int = 128):
                 # 保留较深的，设置为纯黑色
                 _new_pixel_color = (0, 0, 0, 255)
 
-            image_object.putpixel((i, j), _new_pixel_color)
+            _image.putpixel((i, j), _new_pixel_color)
 
-    return image_object
+    _image.save(fp=signpath, format="PNG")
 
 
 def bw_image(imagefilename, targetimagefilenamr):
