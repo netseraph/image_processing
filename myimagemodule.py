@@ -60,7 +60,7 @@ def convert_to_signature(picpath: str, signpath: str, threshold: int = 128):
     for i in range(_size[0]):
         for j in range(_size[1]):
             _pixel_color = _image.getpixel((i, j))
-            print(type(_pixel_color), _pixel_color)
+            # print(type(_pixel_color), _pixel_color)
             _red = int(_pixel_color[0])
             _green = int(_pixel_color[1])
             _blue = int(_pixel_color[2])
@@ -85,7 +85,7 @@ def bw_image(imagefilename, targetimagefilenamr):
     for i in range(_img.size[0]):
         for j in range(_img.size[1]):
             _color = _img.getpixel((i, j))
-            print(_color)
+            # print(_color)
             if _color != (0, 0, 0, 0):
                 _img.putpixel((i, j), (255, 255, 255, 0))
     _img.save(targetimagefilenamr)
@@ -113,7 +113,7 @@ def rotateimage(filename):
     """旋转图片45度"""
     img = Image.open(filename)
     img = img.rotate(45)
-    print("Image Size:", img.size)
+    # print("Image Size:", img.size)
     img.show()
 
 
@@ -193,5 +193,21 @@ def traversal_color(imagefilename: str):
             print(_color)
 
 
-if __name__ == "__main__":
-    traversal_color("test2.bmp")
+def clear_gray(imagefilename: str, outimagefilename: str, threshold: int = 128):
+    """删除灰色背景"""
+    _image = Image.open(imagefilename)
+    if _image.mode != "RGBA":
+        # 给图片增加Alpha通道
+        _image = _image.convert("RGBA")
+    for i in range(_image.size[0]):
+        for j in range(_image.size[1]):
+            _pixel = _image.getpixel((i, j))
+
+            _gray = gray_luma(_pixel[0], _pixel[1], _pixel[2])
+            # print(f"{_color}----->g:{_gray}")
+            if _gray > threshold:
+                # 较浅的，设置为透明
+                _new_pixel_color = (0, 0, 0, 0)
+                _image.putpixel((i, j), _new_pixel_color)
+
+    _image.save(outimagefilename)
